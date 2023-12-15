@@ -12,7 +12,7 @@ func (db *DB) CreateChirp(body string) (Chirp, error) {
 
 	db.mux.Lock()
 	defer db.mux.Unlock()
-
+	db.ensureDB()
 	//get old db bytes and manage errors
 	oldChipsBytes, err := os.ReadFile(db.path)
 	if err != nil {
@@ -26,6 +26,10 @@ func (db *DB) CreateChirp(body string) (Chirp, error) {
 	}
 	//get the current id
 
+	if oldChirps.Chirps == nil {
+		oldChirps.Chirps = make(map[int]Chirp)
+	}
+
 	maxId := 0
 
 	for id := range oldChirps.Chirps {
@@ -33,7 +37,6 @@ func (db *DB) CreateChirp(body string) (Chirp, error) {
 			maxId = id
 		}
 	}
-	fmt.Println(maxId)
 
 	// create a new chirps with the id and body
 	newChirp := Chirp{
@@ -41,15 +44,9 @@ func (db *DB) CreateChirp(body string) (Chirp, error) {
 		Body: body,
 	}
 
-	// Initialize the Chirps map if it's nil
-	if oldChirps.Chirps == nil {
-		oldChirps.Chirps = make(map[int]Chirp)
-	}
-
 	// add the new chirp to the old chirps
 	oldChirps.Chirps[maxId+1] = newChirp
-	//add the new chirps to the old chirps
-	oldChirps.Chirps[maxId+1] = newChirp
+
 	//TODO add the new chip to other chip with new id
 	// Write the updated chips back to the database
 	newChipsBytes, err := json.MarshalIndent(oldChirps, "", "    ")

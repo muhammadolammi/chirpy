@@ -8,13 +8,15 @@ import (
 	"sync"
 )
 
-func (db *DB) ensureDB() {
+func (db *DB) ensureDB() error {
 	if db.mux == nil {
 		db.mux = &sync.RWMutex{}
 	}
 	// Ensure the directory structure exists
 	if err := os.MkdirAll(filepath.Dir(db.path), 0755); err != nil {
-		fmt.Printf("error creating directory structure: %v\n", err)
-		return
+		return fmt.Errorf("error creating directory structure: %v\n", err)
+
 	}
+
+	return nil
 }

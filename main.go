@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -24,17 +23,20 @@ func main() {
 		return
 	}
 
-	body1 := Data{
-		Body: "hi good morning",
-	}
-	body2 := Data{
-		Body: "hi good afternoon",
-	}
-	jsonData1, _ := json.Marshal(body1)
-	jsonData2, _ := json.Marshal(body2)
+	// body1 := Data{
+	// 	Body: "hi good morning",
+	// }
+	// body2 := Data{
+	// 	Body: "hi good afternoon",
+	// }
+	// jsonData1, _ := json.Marshal(body1)
+	// jsonData2, _ := json.Marshal(body2)
 
-	db.CreateChirp(string(jsonData1))
-	db.CreateChirp(string(jsonData2))
+	chirps, _ := db.GetChirps()
+	// if err != nil {
+	// 	fmt.Println("Error creating database:", err)
+	// }
+	fmt.Println(chirps)
 
 	wait := true
 	if wait {
