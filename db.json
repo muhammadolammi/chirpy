@@ -1,0 +1,12 @@
+{
+    "chirps": {
+        "1": {
+            "id": 1,
+            "body": "{\"body\":\"hi good morning\"}"
+        },
+        "2": {
+            "id": 2,
+            "body": "{\"body\":\"hi good afternoon\"}"
+        }
+    }
+}

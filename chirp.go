@@ -2,17 +2,27 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+
+	"github.com/muhammadolammi/chirpy/database"
 )
 
-func chirpyValidateHandler(w http.ResponseWriter, r *http.Request) {
+func chirpyPostHandler(w http.ResponseWriter, r *http.Request) {
 	type Parameters struct {
 		Body string `json:"body"`
 	}
 
+	_, err := database.NewDB("/database/database.json")
+	//TODO use db to create and get chips
+
+	if err != nil {
+		log.Panicf("error creating db. err: %v", err)
+	}
+
 	decoder := json.NewDecoder(r.Body)
 	params := Parameters{}
-	err := decoder.Decode(&params)
+	err = decoder.Decode(&params)
 
 	if err != nil {
 		respondWithError(w, 500, "Something went wrong")
@@ -46,10 +56,16 @@ func chirpyValidateHandler(w http.ResponseWriter, r *http.Request) {
 	formattedreqString := formatString(reqString)
 
 	resBody := struct {
-		CleanedBody string `json:"cleaned_body"`
+		Id   int    `json:"id"`
+		Body string `json:"body"`
 	}{
-		CleanedBody: formattedreqString,
+
+		Body: formattedreqString,
 	}
 	respondWithJSON(w, 200, resBody)
+
+}
+
+func chirpyGetHandler(w http.ResponseWriter, r *http.Request) {
 
 }

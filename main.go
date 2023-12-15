@@ -1,17 +1,46 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/muhammadolammi/chirpy/database"
 )
 
 type apiConfig struct {
 	fileserverHits int
 }
+type Data struct {
+	Body string `json:"body"`
+}
 
 func main() {
+	db, err := database.NewDB("db.json")
+	if err != nil {
+		fmt.Println("Error creating database:", err)
+		return
+	}
+
+	body1 := Data{
+		Body: "hi good morning",
+	}
+	body2 := Data{
+		Body: "hi good afternoon",
+	}
+	jsonData1, _ := json.Marshal(body1)
+	jsonData2, _ := json.Marshal(body2)
+
+	db.CreateChirp(string(jsonData1))
+	db.CreateChirp(string(jsonData2))
+
+	wait := true
+	if wait {
+		return
+	}
+
 	const port = "8080"
 	cfg := apiConfig{}
 	// mux := http.NewServeMux()
@@ -24,7 +53,8 @@ func main() {
 
 	apiRouter.Get("/healthz", readinessHandler)
 	apiRouter.HandleFunc("/reset", cfg.resetHitsHandler)
-	apiRouter.Post("/validate_chirp", chirpyValidateHandler)
+	apiRouter.Post("/chirps", chirpyPostHandler)
+	apiRouter.Get("/chirps", chirpyGetHandler)
 	mainRouter.Mount("/api", apiRouter)
 	// Mount the apiRouter at the root path
 
