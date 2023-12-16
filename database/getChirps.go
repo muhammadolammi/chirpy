@@ -1,25 +1,20 @@
 package database
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
+	"log"
 )
 
 // GetChirps returns all chirps in the database
 func (db *DB) GetChirps() ([]Chirp, error) {
-	db.mux.Lock()
-	defer db.mux.Unlock()
-	dbByte, err := os.ReadFile(db.path)
+	// db.mux.Lock()
+	// defer db.mux.Unlock()
+	log.Println("worrlsss")
+	dbJson, err := db.loadDB()
 	if err != nil {
-		return []Chirp{}, fmt.Errorf("error reading db file err: %v", err)
+		return nil, fmt.Errorf("error loading database: %v", err)
 	}
 
-	dbJson := DBStructure{}
-	err = json.Unmarshal(dbByte, &dbJson)
-	if err != nil {
-		return []Chirp{}, fmt.Errorf("error unmashalling db byte. err: %v", err)
-	}
 	chirps := make([]Chirp, len(dbJson.Chirps))
 	for id, chirp := range dbJson.Chirps {
 		chirps[id-1] = chirp

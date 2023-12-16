@@ -11,9 +11,12 @@ func NewDB(path string) (*DB, error) {
 		path: path,
 	}
 	//make sure directory exist
-	db.ensureDB()
+	err := db.ensureDB()
+	if err != nil {
+		return db, fmt.Errorf(err.Error())
+	}
 	//check if the file exit,
-	_, err := os.Stat(db.path)
+	_, err = os.Stat(db.path)
 	if os.IsNotExist(err) {
 		//create new dile and an empty json structure if it doesnt exit
 		file, err := os.Create(db.path)

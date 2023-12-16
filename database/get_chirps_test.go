@@ -11,18 +11,7 @@ func TestGetChips(t *testing.T) {
 	if err != nil {
 		t.Errorf("theres is an err : %v", err)
 	}
-	// data, err := json.Marshal(struct {
-	// 	Body string `json:"body"`
-	// }{
-	// 	Body: "Good Morning ooo",
-	// })
-	// db.CreateChirp(string(data))
-	// data, err = json.Marshal(struct {
-	// 	Body string `json:"body"`
-	// }{
-	// 	Body: "Good Morning again ooo",
-	// })
-	// db.CreateChirp(string(data))
+
 	chirps, err := db.GetChirps()
 	if err != nil {
 		t.Errorf("theres is an err : %v", err)

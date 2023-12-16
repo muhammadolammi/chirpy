@@ -1,4 +1,3 @@
-// ensureDB creates a new database file if it doesn't exist
 package database
 
 import (
@@ -8,15 +7,44 @@ import (
 	"sync"
 )
 
+// ensureDB creates a new database file if it doesn't exist and ensures the directory structure exists.
 func (db *DB) ensureDB() error {
+	// Initialize mutex if it's not already set
 	if db.mux == nil {
 		db.mux = &sync.RWMutex{}
 	}
-	// Ensure the directory structure exists
-	if err := os.MkdirAll(filepath.Dir(db.path), 0755); err != nil {
-		return fmt.Errorf("error creating directory structure: %v\n", err)
-
+	homeDir, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+		return err
 	}
+
+	dirPath := filepath.Join(homeDir, "database")
+	err = os.MkdirAll(dirPath, 0777)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	fmt.Println("Directory hierarchy created successfully")
+
+	// Check if the directory actually exists
+	info, err := os.Stat(dirPath)
+	if err != nil {
+		fmt.Println("Error checking directory existence:", err)
+		return err
+	}
+
+	fmt.Println("Directory exists:", info.IsDir())
+
+	if err != nil {
+		return fmt.Errorf("error creating directory structure: %v", err)
+	}
+	// Ensure the directory structure exists
+	// file, err := os.Create(filepath.Dir(db.path))
+	// if err != nil {
+	// 	return fmt.Errorf("error creating directory structure: %v", err)
+	// }
+	// defer file.Close()
 
 	return nil
 }
