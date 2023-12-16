@@ -39,7 +39,8 @@ func main() {
 	apiRouter.Post("/chirps", chirpyPostHandler)
 	apiRouter.Get("/chirps", chirpysGetHandler)
 	apiRouter.Get("/chirps/{chirpID:[0-9]+}", chirpGetHandlerWId)
-	apiRouter.Post("/users", postUserHandler)
+	apiRouter.Post("/users", postUsersHandler)
+	apiRouter.Post("/login", loginPostHandler)
 	mainRouter.Mount("/api", apiRouter)
 	// Mount the apiRouter at the root path
 

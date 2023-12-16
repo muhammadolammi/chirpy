@@ -2,7 +2,7 @@ package database
 
 import "fmt"
 
-func (db *DB) CreateUser(email string) (User, error) {
+func (db *DB) CreateUser(email string, pass string) (User, error) {
 
 	db.ensureDB()
 	//load old database
@@ -26,8 +26,9 @@ func (db *DB) CreateUser(email string) (User, error) {
 	}
 	// create a new chirps with the id and body
 	newChirp := Chirp{
-		Id:    maxId + 1,
-		Email: email,
+		Id:       maxId + 1,
+		Email:    email,
+		Password: pass,
 	}
 	newUser := User{
 		Id:    maxId + 1,
