@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -12,7 +14,16 @@ type apiConfig struct {
 }
 
 func main() {
+	// Define and parse the "debug" flag
+	dbg := flag.Bool("debug", false, "Enable debug mode")
+	flag.Parse()
 
+	// Access the value through the pointer
+	if *dbg {
+		fmt.Println("Debug mode is enabled")
+	} else {
+		fmt.Println("Debug mode is disabled")
+	}
 	const port = "8080"
 	cfg := apiConfig{}
 	// mux := http.NewServeMux()
@@ -26,7 +37,9 @@ func main() {
 	apiRouter.Get("/healthz", readinessHandler)
 	apiRouter.HandleFunc("/reset", cfg.resetHitsHandler)
 	apiRouter.Post("/chirps", chirpyPostHandler)
-	apiRouter.Get("/chirps", chirpyGetHandler)
+	apiRouter.Get("/chirps", chirpysGetHandler)
+	apiRouter.Get("/chirps/{chirpID:[0-9]+}", chirpGetHandlerWId)
+	apiRouter.Post("/users", postUserHandler)
 	mainRouter.Mount("/api", apiRouter)
 	// Mount the apiRouter at the root path
 

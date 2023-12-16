@@ -25,20 +25,17 @@ func (db *DB) ensureDB() error {
 		fmt.Println(err)
 		return err
 	}
-	fmt.Println("Directory hierarchy created successfully")
+	// fmt.Println("Directory hierarchy created successfully")
 
 	// Check if the directory actually exists
-	info, err := os.Stat(dirPath)
+	_, err = os.Stat(dirPath)
 	if err != nil {
-		fmt.Println("Error checking directory existence:", err)
+		// fmt.Println("Error checking directory existence:", err)
 		return err
 	}
 
-	fmt.Println("Directory exists:", info.IsDir())
+	// fmt.Println("Directory exists:", info.IsDir())
 
-	if err != nil {
-		return fmt.Errorf("error creating directory structure: %v", err)
-	}
 	// Ensure the directory structure exists
 	// file, err := os.Create(filepath.Dir(db.path))
 	// if err != nil {

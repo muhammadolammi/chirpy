@@ -8,7 +8,6 @@ import (
 // GetChirps returns all chirps in the database
 func (db *DB) GetChirps() ([]Chirp, error) {
 	// db.mux.Lock()
-	// defer db.mux.Unlock()
 	log.Println("worrlsss")
 	dbJson, err := db.loadDB()
 	if err != nil {

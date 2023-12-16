@@ -2,9 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/muhammadolammi/chirpy/database"
 )
 
@@ -48,7 +51,7 @@ func chirpyPostHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func chirpyGetHandler(w http.ResponseWriter, r *http.Request) {
+func chirpysGetHandler(w http.ResponseWriter, r *http.Request) {
 	db, err := database.NewDB("database/database.json")
 
 	//TODO use db to create and get chips
@@ -64,5 +67,42 @@ func chirpyGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respondWithJSON(w, 200, chirps)
+
+}
+
+func chirpGetHandlerWId(w http.ResponseWriter, r *http.Request) {
+	// Extract the chirpID from the URL using chi
+	chirpIDStr := chi.URLParam(r, "chirpID")
+
+	// Remove the "id:" prefix if it exists
+	chirpIDStr = strings.TrimPrefix(chirpIDStr, "id:")
+
+	// Convert chirpID from string to int
+	var chirpID int
+	if _, err := fmt.Sscanf(chirpIDStr, "%d", &chirpID); err != nil {
+
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	db, err := database.NewDB("database/database.json")
+
+	if err != nil {
+
+		respondWithError(w, 500, "Internal Server Error")
+		return
+	}
+	chirps, err := db.GetChirps()
+	if err != nil {
+		respondWithError(w, 400, err.Error())
+		return
+	}
+
+	if chirpID > len(chirps) {
+
+		respondWithError(w, 404, "doesnt exit")
+		return
+	}
+	respondWithJSON(w, 200, chirps[chirpID-1])
 
 }
