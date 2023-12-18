@@ -19,6 +19,11 @@ func (cfg *apiConfig) putUserHandler(w http.ResponseWriter, r *http.Request) {
 		Password string `json:"password"`
 		Email    string `json:"email"`
 	}
+	type Responds struct {
+		Id int `json:"id"`
+
+		Email string `json:"email"`
+	}
 
 	decoder := json.NewDecoder(r.Body)
 	params := Parameters{}
@@ -72,7 +77,7 @@ func (cfg *apiConfig) putUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resBody := database.User{
+	resBody := Responds{
 		Id:    userid,
 		Email: params.Email,
 	}
@@ -93,7 +98,7 @@ func getTokenFromHeader(r *http.Request) (string, error) {
 	// Split the header value to get the token part
 	tokenParts := strings.Split(bearerToken, " ")
 	if len(tokenParts) != 2 || strings.ToLower(tokenParts[0]) != "bearer" {
-		return "", errors.New("Invalid Authorization header format")
+		return "", errors.New("invalid Authorization header format")
 	}
 
 	// Return the token part

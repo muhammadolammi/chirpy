@@ -15,7 +15,11 @@ func postUsersHandler(w http.ResponseWriter, r *http.Request) {
 		Password string `json:"password"`
 		Email    string `json:"email"`
 	}
+	type Responds struct {
+		Id int `json:"id"`
 
+		Email string `json:"email"`
+	}
 	decoder := json.NewDecoder(r.Body)
 	params := Parameters{}
 	err := decoder.Decode(&params)
@@ -59,9 +63,13 @@ func postUsersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resBody, err := db.CreateUser(string(reqEmail), string(encryptedPasss))
+	user, err := db.CreateUser(string(reqEmail), string(encryptedPasss))
 	if err != nil {
 		respondWithError(w, 400, err.Error())
+	}
+	resBody := Responds{
+		Id:    user.Id,
+		Email: params.Email,
 	}
 
 	respondWithJSON(w, 201, resBody)
