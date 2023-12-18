@@ -57,6 +57,18 @@ func (cfg *apiConfig) putUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 
 	}
+	issuer, err := claims.GetIssuer()
+	if err != nil {
+
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+
+	}
+	if issuer == "chirpy-refresh" {
+		respondWithError(w, http.StatusUnauthorized, "refresh token not allowed")
+		return
+
+	}
 	//get the id
 	userIdS := claims.Subject
 	userid, err := strconv.Atoi(userIdS)

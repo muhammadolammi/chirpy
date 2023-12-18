@@ -21,9 +21,10 @@ func (cfg *apiConfig) postLoginHandler(w http.ResponseWriter, r *http.Request) {
 		Expires_In_Seconds *int   `json:"expires_in_seconds"`
 	}
 	type Responds struct {
-		Id    int    `json:"id"`
-		Email string `json:"email"`
-		Token string `json:"token"`
+		Id           int    `json:"id"`
+		Email        string `json:"email"`
+		Token        string `json:"token"`
+		RefreshToken string `json:"refresh_token"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -66,14 +67,12 @@ func (cfg *apiConfig) postLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		respondWithError(w, 500, err.Error())
 	}
-	exp := getExpiringTime(params.Expires_In_Seconds)
-	expirationTime := time.Now().UTC().Add(time.Duration(exp) * time.Second)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaim{
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    "chirpy",
+			Issuer:    "chirpy-access",
 			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
-			ExpiresAt: jwt.NewNumericDate(expirationTime),
+			ExpiresAt: jwt.NewNumericDate(time.Now().UTC().Add(time.Hour)),
 			Subject:   fmt.Sprintf("%v", user.Id),
 		},
 	})
@@ -84,26 +83,29 @@ func (cfg *apiConfig) postLoginHandler(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaim{
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    "chirpy-refresh",
+			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().UTC().Add(60 * 24 * time.Hour)),
+			Subject:   fmt.Sprintf("%v", user.Id),
+		},
+	})
+
+	refreshTokenString, err := refreshToken.SignedString([]byte(cfg.JWT_SECRET))
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 	resBody := Responds{
-		Id:    user.Id,
-		Email: user.Email,
-		Token: tokenString,
+		Id:           user.Id,
+		Email:        user.Email,
+		Token:        tokenString,
+		RefreshToken: refreshTokenString,
 	}
 
 	respondWithJSON(w, 200, resBody)
 
-}
-
-func getExpiringTime(exp *int) int {
-	hour := int(time.Hour.Seconds())
-	if exp == nil {
-		return hour
-	}
-	if *exp <= 0 {
-		return hour
-	}
-	if *exp > hour {
-		return hour
-	}
-	return *exp
 }
