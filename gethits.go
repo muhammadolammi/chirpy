@@ -21,7 +21,7 @@ func (cfg *apiConfig) getHitsHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	variables := PageVariables{Hits: cfg.fileserverHits}
+	variables := PageVariables{Hits: cfg.FileserverHits}
 	err = tmpl.Execute(w, variables)
 	if err != nil {
 		log.Fatal(err)

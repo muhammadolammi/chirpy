@@ -6,6 +6,6 @@ import (
 )
 
 func (cfg *apiConfig) resetHitsHandler(w http.ResponseWriter, r *http.Request) {
-	cfg.fileserverHits = 0
-	fmt.Fprintf(w, "Hits: %v	", cfg.fileserverHits)
+	cfg.FileserverHits = 0
+	fmt.Fprintf(w, "Hits: %v	", cfg.FileserverHits)
 }
