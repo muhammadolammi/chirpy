@@ -1,27 +1,35 @@
 package database
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // CreateChirp creates a new chirp and saves it to disk
 
 func (db *DB) CreateChirp(body string) (Chirp, error) {
 
 	db.ensureDB()
+	//make sure its chirps database
+	if db.path != "database/database.json" {
+		return Chirp{}, errors.New("this is not the chrips directory")
+	}
+
 	//load old database
-	oldDb, err := db.loadDB()
+	oldChirps, err := db.loadChirps()
 
 	if err != nil {
 		return Chirp{}, fmt.Errorf("error getting old db to create new chip. err : %v", err)
 	}
-	//chech if old db is empty
+	//chech if old cgirps  is empty
 
-	if oldDb.Chirps == nil {
-		oldDb.Chirps = make(map[int]Chirp)
+	if oldChirps.Chirps == nil {
+		oldChirps.Chirps = make(map[int]Chirp)
 	}
 
 	maxId := 0
 
-	for id := range oldDb.Chirps {
+	for id := range oldChirps.Chirps {
 		if id > maxId {
 			maxId = id
 		}
@@ -33,10 +41,10 @@ func (db *DB) CreateChirp(body string) (Chirp, error) {
 	}
 
 	// add the new chirp to the old chirps
-	oldDb.Chirps[maxId+1] = newChirp
+	oldChirps.Chirps[maxId+1] = newChirp
 
 	// Write the updated chips back to the database
-	err = db.writeDB(oldDb)
+	err = db.writeDB(oldChirps)
 	if err != nil {
 		return Chirp{}, fmt.Errorf(err.Error())
 	}

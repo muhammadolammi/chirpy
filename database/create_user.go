@@ -1,45 +1,50 @@
 package database
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
-func (db *DB) CreateUser(email string, pass string) (User, error) {
+func (db *DB) CreateUser(email, encryptedPass string) (User, error) {
 
 	db.ensureDB()
+
+	//make sure its the user database
+	if db.path != "database/users.json" {
+		return User{}, errors.New("this is not the chrips directory")
+	}
 	//load old database
-	oldDb, err := db.loadDB()
+	oldUsers, err := db.loaUsers()
 
 	if err != nil {
-		return User{}, fmt.Errorf("error getting old db to create new chip. err : %v", err)
+		return User{}, fmt.Errorf("error getting old users to new new chip. err : %v", err)
 	}
 	//chech if old db is empty
 
-	if oldDb.Chirps == nil {
-		oldDb.Chirps = make(map[int]Chirp)
+	if oldUsers.Users == nil {
+		oldUsers.Users = make(map[int]User)
 	}
 
 	maxId := 0
 
-	for id := range oldDb.Chirps {
+	for id := range oldUsers.Users {
 		if id > maxId {
 			maxId = id
 		}
 	}
 	// create a new chirps with the id and body
-	newChirp := Chirp{
+
+	newUser := User{
 		Id:       maxId + 1,
 		Email:    email,
-		Password: pass,
-	}
-	newUser := User{
-		Id:    maxId + 1,
-		Email: email,
+		Password: encryptedPass,
 	}
 
 	// add the new chirp to the old chirps
-	oldDb.Chirps[maxId+1] = newChirp
+	oldUsers.Users[maxId+1] = newUser
 
 	// Write the updated chips back to the database
-	err = db.writeDB(oldDb)
+	err = db.writeDB(oldUsers)
 	if err != nil {
 		return User{}, fmt.Errorf(err.Error())
 	}

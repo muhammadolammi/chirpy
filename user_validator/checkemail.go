@@ -1,22 +1,20 @@
 package uservalidator
 
 import (
-	"errors"
-
 	"github.com/muhammadolammi/chirpy/database"
 )
 
 func CheckEmail(email string, db *database.DB) (bool, error) {
 
-	chirps, err := db.GetChirps()
+	users, err := db.GetUsers()
 	if err != nil {
 
-		return false, errors.New("error getting db")
+		return false, err
 
 	}
 
-	for _, chirp := range chirps {
-		if email == chirp.Email {
+	for _, user := range users {
+		if email == user.Email {
 			return true, nil
 		}
 	}

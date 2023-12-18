@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetChips(t *testing.T) {
-	db, err := NewDB("db_test.json")
+	db, err := NewChirpsDB("db_test.json")
 	if err != nil {
 		t.Errorf("theres is an err : %v", err)
 	}
@@ -20,7 +20,7 @@ func TestGetChips(t *testing.T) {
 	if err != nil {
 		t.Errorf("theres is an err : %v", err)
 	}
-	localDb := DBStructure{}
+	localDb := Chirpstructure{}
 	err = json.Unmarshal(localDbyte, &localDb)
 	if err != nil {
 		t.Errorf("theres is an err : %v", err)

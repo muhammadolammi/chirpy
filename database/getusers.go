@@ -6,21 +6,21 @@ import (
 )
 
 // GetChirps returns all chirps in the database
-func (db *DB) GetChirps() ([]Chirp, error) {
+func (db *DB) GetUsers() ([]User, error) {
 	// db.mux.Lock()
-	if db.path != "database/database.json" {
+	if db.path != "database/users.json" {
 		return nil, errors.New("wrong directory to create chripys")
 	}
 
-	dbJson, err := db.loadChirps()
+	dbJson, err := db.loaUsers()
 	if err != nil {
 		return nil, fmt.Errorf("error loading database: %v", err)
 	}
 
-	chirps := make([]Chirp, len(dbJson.Chirps))
-	for id, chirp := range dbJson.Chirps {
-		chirps[id-1] = chirp
+	users := make([]User, len(dbJson.Users))
+	for id, user := range dbJson.Users {
+		users[id-1] = user
 	}
 
-	return chirps, nil
+	return users, nil
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -34,12 +33,13 @@ func chirpyPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	reqString := params.Body
 	formattedreqString := formatString(reqString)
-	db, err := database.NewDB("database/database.json")
+	db, err := database.NewChirpsDB("database/database.json")
 
 	//TODO use db to create and get chips
 
 	if err != nil {
-		log.Printf("error creating db. err: %v", err)
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	resBody, err := db.CreateChirp(string(formattedreqString))
@@ -52,7 +52,7 @@ func chirpyPostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func chirpysGetHandler(w http.ResponseWriter, r *http.Request) {
-	db, err := database.NewDB("database/database.json")
+	db, err := database.NewChirpsDB("database/database.json")
 
 	//TODO use db to create and get chips
 
@@ -85,7 +85,7 @@ func chirpGetHandlerWId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db, err := database.NewDB("database/database.json")
+	db, err := database.NewChirpsDB("database/database.json")
 
 	if err != nil {
 

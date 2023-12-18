@@ -26,6 +26,8 @@ func serverEnrty(cfg *apiConfig) {
 	apiRouter.Post("/users", postUsersHandler)
 	apiRouter.Put("/users", cfg.putUserHandler)
 	apiRouter.Post("/login", cfg.postLoginHandler)
+	apiRouter.Post("/refresh", cfg.postRefreshHandler)
+	apiRouter.Post("/revoke", cfg.postRevokeHandler)
 	mainRouter.Mount("/api", apiRouter)
 	// Mount the apiRouter at the root path
 

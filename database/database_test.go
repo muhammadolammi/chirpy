@@ -5,7 +5,7 @@ import (
 )
 
 func TestCreateDb(t *testing.T) {
-	_, err := NewDB("database.json")
+	_, err := NewChirpsDB("database.json")
 	if err != nil {
 		t.Error(err)
 	}

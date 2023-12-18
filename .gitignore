@@ -1,3 +1,5 @@
 chirpy
 database.json
 .env
+users.json
+sessions.json

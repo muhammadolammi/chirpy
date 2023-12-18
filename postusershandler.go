@@ -16,8 +16,7 @@ func postUsersHandler(w http.ResponseWriter, r *http.Request) {
 		Email    string `json:"email"`
 	}
 	type Responds struct {
-		Id int `json:"id"`
-
+		Id    int    `json:"id"`
 		Email string `json:"email"`
 	}
 	decoder := json.NewDecoder(r.Body)
@@ -46,8 +45,7 @@ func postUsersHandler(w http.ResponseWriter, r *http.Request) {
 
 	reqEmail := params.Email
 
-	//TODO use db to create and get chips
-	db, err := database.NewDB("database/database.json")
+	db, err := database.NewUsersDB("database/users.json")
 	if err != nil {
 		log.Printf("error creating db. err: %v", err)
 	}

@@ -2,11 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"time"
-
-	jwt "github.com/golang-jwt/jwt/v5"
 
 	"github.com/muhammadolammi/chirpy/database"
 	uservalidator "github.com/muhammadolammi/chirpy/user_validator"
@@ -36,7 +32,7 @@ func (cfg *apiConfig) postLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 
 	}
-	db, err := database.NewDB("database/database.json")
+	db, err := database.NewUsersDB("database/users.json")
 	if err != nil {
 		respondWithError(w, 500, err.Error())
 		return
@@ -52,7 +48,7 @@ func (cfg *apiConfig) postLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 
 	}
-	passValidator, err := uservalidator.ValidatePass(params.Password, db)
+	passValidator, err := uservalidator.ValidatePass(params.Password, params.Email, db)
 	if !passValidator {
 		respondWithError(w, 401, "wrong password")
 		return
@@ -68,32 +64,14 @@ func (cfg *apiConfig) postLoginHandler(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, 500, err.Error())
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaim{
-		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    "chirpy-access",
-			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().UTC().Add(time.Hour)),
-			Subject:   fmt.Sprintf("%v", user.Id),
-		},
-	})
-
-	tokenString, err := token.SignedString([]byte(cfg.JWT_SECRET))
+	tokenString, err := createToken(cfg.JWT_SECRET, "user-access", user.Id)
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaim{
-		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    "chirpy-refresh",
-			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().UTC().Add(60 * 24 * time.Hour)),
-			Subject:   fmt.Sprintf("%v", user.Id),
-		},
-	})
-
-	refreshTokenString, err := refreshToken.SignedString([]byte(cfg.JWT_SECRET))
+	refreshTokenString, err := createToken(cfg.JWT_SECRET, "user-refresh", user.Id)
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())

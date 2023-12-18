@@ -2,13 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
-	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/muhammadolammi/chirpy/database"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -30,59 +27,58 @@ func (cfg *apiConfig) putUserHandler(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&params)
 
 	if err != nil {
-		respondWithError(w, 500, "Something went wrong")
+		respondWithError(w, http.StatusInternalServerError, "Something went wrong")
 		return
 
 	}
-	db, err := database.NewDB("database/database.json")
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
+
 	tokS, err := getTokenFromHeader(r)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		respondWithError(w, 401, err.Error())
 		return
 	}
+	userIdString, err := ValidateJWT(tokS, cfg.JWT_SECRET, "user-access")
+	if err != nil {
+		respondWithError(w, 401, err.Error())
+		return
+	}
+
 	log.Println(tokS)
-	claims := CustomClaim{}
-	//pasrse into the claim with the token string
-	_, err = jwt.ParseWithClaims(tokS, &claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(cfg.JWT_SECRET), nil
-	})
 
-	if err != nil {
-
-		respondWithError(w, http.StatusUnauthorized, err.Error())
-		return
-
-	}
-	issuer, err := claims.GetIssuer()
-	if err != nil {
-
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-
-	}
-	if issuer == "chirpy-refresh" {
-		respondWithError(w, http.StatusUnauthorized, "refresh token not allowed")
-		return
-
-	}
-	//get the id
-	userIdS := claims.Subject
-	userid, err := strconv.Atoi(userIdS)
+	//parse string id to int
+	userid, err := strconv.Atoi(userIdString)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	// claims := CustomClaim{}
+	// //pasrse into the claim with the token string
+	// _, err = jwt.ParseWithClaims(tokS, &claims, func(token *jwt.Token) (interface{}, error) {
+	// 	return []byte(cfg.JWT_SECRET), nil
+	// })
+
+	// if err != nil {
+	// 	log.Printf("Error parsing token: %v", err)
+	// 	respondWithError(w, http.StatusUnauthorized, err.Error())
+	// 	return
+	// }
+
+	// //get the id
+	// userIdS := claims.Subject
+
 	// encrypt the password
 	encryptedPasss, err := bcrypt.GenerateFromPassword([]byte(params.Password), 10)
 	if err != nil {
 		respondWithError(w, 400, err.Error())
 		return
-	}
+	} //
 	//lets update the user
+	db, err := database.NewUsersDB("database/users.json")
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 	err = db.UpdateUser(userid, params.Email, string(encryptedPasss))
 	if err != nil {
 		respondWithError(w, 400, err.Error())
@@ -96,23 +92,4 @@ func (cfg *apiConfig) putUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	respondWithJSON(w, 200, resBody)
 
-}
-
-func getTokenFromHeader(r *http.Request) (string, error) {
-	// Get the "Authorization" header
-	bearerToken := r.Header.Get("Authorization")
-
-	// Check if the header is empty
-	if bearerToken == "" {
-		return "", nil // No token present, not an error
-	}
-
-	// Split the header value to get the token part
-	tokenParts := strings.Split(bearerToken, " ")
-	if len(tokenParts) != 2 || strings.ToLower(tokenParts[0]) != "bearer" {
-		return "", errors.New("invalid Authorization header format")
-	}
-
-	// Return the token part
-	return tokenParts[1], nil
 }

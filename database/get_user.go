@@ -5,15 +5,16 @@ func (db *DB) GetUser(email string) (User, error) {
 	if err != nil {
 		return User{}, err
 	}
-	chirps, err := db.GetChirps()
+	users, err := db.GetUsers()
 	if err != nil {
 		return User{}, err
 	}
-	for _, chirp := range chirps {
-		if email == chirp.Email {
+	for _, user := range users {
+		if email == user.Email {
 			return User{
-				Id:    chirp.Id,
-				Email: chirp.Email,
+				Id:       user.Id,
+				Email:    user.Email,
+				Password: user.Password,
 			}, nil
 
 		}

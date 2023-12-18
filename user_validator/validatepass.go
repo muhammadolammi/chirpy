@@ -7,24 +7,22 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func ValidatePass(pass string, db *database.DB) (bool, error) {
-	chirps, err := db.GetChirps()
+func ValidatePass(pass, email string, db *database.DB) (bool, error) {
+	user, err := db.GetUser(email)
 	if err != nil {
 		return false, err
 	}
-	for _, chirp := range chirps {
-		err := bcrypt.CompareHashAndPassword([]byte(chirp.Password), []byte(pass))
-		if err == nil {
-			// Passwords match
-			return true, nil
-		} else if err == bcrypt.ErrMismatchedHashAndPassword {
-			// Passwords do not match
-			return false, errors.New("Wrong password")
-		} else {
-			// An error occurred
-			return false, err
-		}
-	}
 
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(pass))
+	if err == nil {
+		// Passwords match
+		return true, nil
+	} else if err == bcrypt.ErrMismatchedHashAndPassword {
+		// Passwords do not match
+		return false, errors.New("Wrong password")
+	} else {
+		// An error occurred
+		return false, err
+	}
 	return false, nil
 }

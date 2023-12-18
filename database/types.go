@@ -1,23 +1,34 @@
 package database
 
-import "sync"
+import (
+	"sync"
+	"time"
+)
 
 type User struct {
-	Id    int    `json:"id"`
-	Email string `json:"email"`
-	Token string `json:"token"`
+	Id       int    `json:"id"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 type DB struct {
 	path string
 	mux  *sync.RWMutex
 }
-type DBStructure struct {
+type Chirpstructure struct {
 	Chirps map[int]Chirp `json:"chirps"`
 }
 
+type RevokedSessionDetail struct {
+	Time time.Time `json:"time"`
+}
+type RevokedSesssionstructure struct {
+	RevokedSessions map[string]RevokedSessionDetail `json:"revoked_sessions"`
+}
+type Userstructure struct {
+	Users map[int]User `json:"users"`
+}
+
 type Chirp struct {
-	Id       int    `json:"id"`
-	Body     string `json:"body"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Id   int    `json:"id"`
+	Body string `json:"body"`
 }
