@@ -24,6 +24,7 @@ func serverEnrty(cfg *apiConfig) {
 	apiRouter.Get("/chirps", chirpysGetHandler)
 	apiRouter.Get("/chirps/{chirpID:[0-9]+}", chirpGetHandlerWId)
 	apiRouter.Post("/users", postUsersHandler)
+	apiRouter.Put("/users", cfg.putUserHandler)
 	apiRouter.Post("/login", cfg.postLoginHandler)
 	mainRouter.Mount("/api", apiRouter)
 	// Mount the apiRouter at the root path

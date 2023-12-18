@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	jwt "github.com/golang-jwt/jwt/v5"
+
 	"github.com/muhammadolammi/chirpy/database"
 	uservalidator "github.com/muhammadolammi/chirpy/user_validator"
 )
@@ -17,7 +18,7 @@ func (cfg *apiConfig) postLoginHandler(w http.ResponseWriter, r *http.Request) {
 	type Parameters struct {
 		Password           string `json:"password"`
 		Email              string `json:"email"`
-		Expires_In_Seconds int    `json:"expires_in_seconds"`
+		Expires_In_Seconds *int   `json:"expires_in_seconds"`
 	}
 	type Responds struct {
 		Id    int    `json:"id"`
@@ -65,13 +66,16 @@ func (cfg *apiConfig) postLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		respondWithError(w, 500, err.Error())
 	}
-
 	exp := getExpiringTime(params.Expires_In_Seconds)
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Issuer:    "chirpy",
-		IssuedAt:  time.Now().UTC().Unix(),
-		ExpiresAt: time.Now().UTC().Unix() + int64(exp),
-		Subject:   fmt.Sprintf("%v", user.Id),
+	expirationTime := time.Now().UTC().Add(time.Duration(exp) * time.Second)
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaim{
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    "chirpy",
+			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
+			Subject:   fmt.Sprintf("%v", user.Id),
+		},
 	})
 
 	tokenString, err := token.SignedString([]byte(cfg.JWT_SECRET))
@@ -90,12 +94,16 @@ func (cfg *apiConfig) postLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func getExpiringTime(exp int) int {
-	if exp == 0 {
-		return 24
+func getExpiringTime(exp *int) int {
+	hour := int(time.Hour.Seconds())
+	if exp == nil {
+		return hour
 	}
-	if exp > 24 {
-		return 24
+	if *exp <= 0 {
+		return hour
 	}
-	return exp
+	if *exp > hour {
+		return hour
+	}
+	return *exp
 }

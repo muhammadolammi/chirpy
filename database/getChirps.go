@@ -20,3 +20,14 @@ func (db *DB) GetChirps() ([]Chirp, error) {
 
 	return chirps, nil
 }
+
+func (db *DB) GetChirpsMap() (map[int]Chirp, error) {
+	// db.mux.Lock()
+
+	dbJson, err := db.loadDB()
+	if err != nil {
+		return nil, fmt.Errorf("error loading database: %v", err)
+	}
+
+	return dbJson.Chirps, nil
+}
