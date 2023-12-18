@@ -31,6 +31,10 @@ func (cfg *apiConfig) postRefreshHandler(w http.ResponseWriter, r *http.Request)
 	}
 	//todo make sure to solve this commendted out issession
 	isSession, err := db.IsSession(refreshTokenString)
+	if err != nil {
+		respondWithError(w, 401, err.Error())
+		return
+	}
 
 	//manage if no session ie session not revoked
 	if isSession {
