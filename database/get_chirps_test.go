@@ -28,7 +28,7 @@ func TestGetChips(t *testing.T) {
 	localDbArr := MapToArray(localDb.Chirps)
 	for id, ch := range localDbArr {
 		ch2 := chirps[id]
-		if ch.Id != ch2.Id {
+		if ch.AuthorId != ch2.AuthorId {
 			t.Error("something went wrong")
 
 		}

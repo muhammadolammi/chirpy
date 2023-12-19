@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (db *DB) CreateUser(email, encryptedPass string) (User, error) {
+func (db *DB) CreateUser(email, encryptedPass string, isChirpyRed bool) (User, error) {
 
 	db.ensureDB()
 
@@ -35,9 +35,10 @@ func (db *DB) CreateUser(email, encryptedPass string) (User, error) {
 	// create a new chirps with the id and body
 
 	newUser := User{
-		Id:       maxId + 1,
-		Email:    email,
-		Password: encryptedPass,
+		Id:          maxId + 1,
+		Email:       email,
+		Password:    encryptedPass,
+		IsChirpyRed: isChirpyRed,
 	}
 
 	// add the new chirp to the old chirps

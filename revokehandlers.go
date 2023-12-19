@@ -8,7 +8,7 @@ import (
 
 func (cfg *apiConfig) postRevokeHandler(w http.ResponseWriter, r *http.Request) {
 
-	refreshTokenString, err := getTokenFromHeader(r)
+	refreshTokenString, err := getTokenFromHeader(r, "bearer")
 	if err != nil {
 		respondWithError(w, 401, err.Error())
 		return

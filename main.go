@@ -11,6 +11,7 @@ import (
 type apiConfig struct {
 	FileserverHits int
 	JWT_SECRET     string
+	POLKA_API_KEY  string
 }
 
 func main() {
@@ -28,9 +29,11 @@ func main() {
 	// by default, godotenv will look for a file named .env in the current directory
 	godotenv.Load()
 	jwtSecret := os.Getenv("JWT_SECRET")
+	polkaApiKey := os.Getenv("POLKA_API_KEY")
 
 	cfg := apiConfig{
-		JWT_SECRET: jwtSecret,
+		JWT_SECRET:    jwtSecret,
+		POLKA_API_KEY: polkaApiKey,
 	}
 	serverEnrty(&cfg)
 }

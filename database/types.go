@@ -6,9 +6,11 @@ import (
 )
 
 type User struct {
-	Id       int    `json:"id"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Id          int    `json:"id"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+	IsLoggedIn  bool   `json:"is_logged_in"`
+	IsChirpyRed bool   `json:"is_chirpy_red"`
 }
 type DB struct {
 	path string
@@ -29,6 +31,7 @@ type Userstructure struct {
 }
 
 type Chirp struct {
-	Id   int    `json:"id"`
-	Body string `json:"body"`
+	AuthorId int    `json:"author_id"`
+	Body     string `json:"body"`
+	Id       int    `json:"id"`
 }

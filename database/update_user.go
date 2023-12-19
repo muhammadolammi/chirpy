@@ -4,7 +4,7 @@ import (
 	"errors"
 )
 
-func (db *DB) UpdateUser(id int, email, pass string) error {
+func (db *DB) UpdateUser(user User) error {
 
 	//make sure its the user database
 	if db.path != "database/users.json" {
@@ -18,14 +18,12 @@ func (db *DB) UpdateUser(id int, email, pass string) error {
 	}
 
 	//get the current user with the user id.
-	curChirp, ok := databaseStruct.Users[id]
+	_, ok := databaseStruct.Users[user.Id]
 	if !ok {
 		return errors.New("no user with that id ")
 	}
-	updtatedChrip := curChirp
-	updtatedChrip.Email = email
-	updtatedChrip.Password = pass
-	databaseStruct.Users[id] = updtatedChrip
+
+	databaseStruct.Users[user.Id] = user
 	db.writeDB(databaseStruct)
 	return nil
 

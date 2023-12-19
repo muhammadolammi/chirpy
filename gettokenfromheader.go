@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func getTokenFromHeader(r *http.Request) (string, error) {
+func getTokenFromHeader(r *http.Request, typ string) (string, error) {
 	// Get the "Authorization" header
 	bearerToken := r.Header.Get("Authorization")
 
@@ -17,7 +17,7 @@ func getTokenFromHeader(r *http.Request) (string, error) {
 
 	// Split the header value to get the token part
 	tokenParts := strings.Split(bearerToken, " ")
-	if len(tokenParts) != 2 || strings.ToLower(tokenParts[0]) != "bearer" {
+	if len(tokenParts) != 2 || strings.ToLower(tokenParts[0]) != typ {
 		return "", errors.New("invalid Authorization header format")
 	}
 

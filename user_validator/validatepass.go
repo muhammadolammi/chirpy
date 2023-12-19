@@ -8,7 +8,7 @@ import (
 )
 
 func ValidatePass(pass, email string, db *database.DB) (bool, error) {
-	user, err := db.GetUser(email)
+	user, err := db.GetUserByEmail(email)
 	if err != nil {
 		return false, err
 	}

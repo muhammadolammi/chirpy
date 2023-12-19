@@ -7,7 +7,7 @@ import (
 
 // CreateChirp creates a new chirp and saves it to disk
 
-func (db *DB) CreateChirp(body string) (Chirp, error) {
+func (db *DB) CreateChirp(body string, userId int) (Chirp, error) {
 
 	db.ensureDB()
 	//make sure its chirps database
@@ -36,8 +36,10 @@ func (db *DB) CreateChirp(body string) (Chirp, error) {
 	}
 	// create a new chirps with the id and body
 	newChirp := Chirp{
-		Id:   maxId + 1,
-		Body: body,
+
+		AuthorId: userId,
+		Body:     body,
+		Id:       maxId + 1,
 	}
 
 	// add the new chirp to the old chirps
